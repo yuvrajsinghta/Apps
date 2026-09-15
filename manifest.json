@@ -2,11 +2,16 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "Ledger",
+  "name": "Apps",
   "orientation": "any",
   "scope": "/",
+<<<<<<< HEAD
   "short_name": "Ledger",
   "start_url": "https://yuvrajsinghta.github.io/apps/",
+=======
+  "short_name": "Apps",
+  "start_url": "https://yuvrajsinghta.github.io/Apps/",
+>>>>>>> 0afe187d6d1915ae9a57ceea73c414836c45e7ef
   "theme_color": "#ffffff",
   "icons": [
     {
