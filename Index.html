@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PU Foam Packing Cost Calculator</title>
+<style>
+  :root {
+    --marble: #EEEAE2;
+    --marble-vein: #D8D1C4;
+    --stone: #3A362F;
+    --stone-soft: #6B6558;
+    --bronze: #A9702F;
+    --bronze-deep: #7E4F1F;
+    --danger: #A13A2E;
+    --ok-bg: #F4EFE3;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    background: var(--marble);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 35%),
+      radial-gradient(circle at 85% 80%, rgba(0,0,0,0.04) 0%, transparent 40%);
+    color: var(--stone);
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sheet {
+    width: 100%;
+    max-width: 640px;
+    background: #FBFAF7;
+    border: 1px solid var(--marble-vein);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 18px 40px -20px rgba(58,54,47,0.35);
+  }
+
+  .sheet-head {
+    padding: 34px 38px 26px;
+    border-bottom: 1px solid var(--marble-vein);
+    position: relative;
+  }
+
+  .sheet-head::after {
+    content: "";
+    position: absolute;
+    left: 38px;
+    bottom: -1px;
+    width: 44px;
+    height: 3px;
+    background: var(--bronze);
+  }
+
+  .kicker {
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+    color: var(--stone-soft);
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0;
+    color: var(--stone);
+  }
+
+  .sheet-body { padding: 30px 38px 38px; }
+
+  .section { margin-bottom: 26px; }
+
+  .section-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--marble-vein);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bronze-deep);
+    margin: 0;
+  }
+
+  .unit-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--marble-vein);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .unit-toggle button {
+    all: unset;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    color: var(--stone-soft);
+    background: #fff;
+  }
+
+  .unit-toggle button.active {
+    background: var(--stone);
+    color: #F3EEE3;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .foam-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--stone-soft);
+    margin-bottom: 5px;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 14.5px;
+    border: 1px solid var(--marble-vein);
+    background: #fff;
+    color: var(--stone);
+    border-radius: 2px;
+    font-family: inherit;
+  }
+
+  .field select { cursor: pointer; }
+
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: var(--bronze);
+    box-shadow: 0 0 0 3px rgba(169,112,47,0.12);
+  }
+
+  .field-note {
+    font-size: 11.5px;
+    color: var(--stone-soft);
+    margin-top: 5px;
+  }
+
+  button.calc-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    background: var(--stone);
+    color: #F3EEE3;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  button.calc-btn:hover { background: var(--bronze-deep); }
+  button.calc-btn:active { transform: translateY(1px); }
+
+  .result {
+    margin-top: 26px;
+    border: 1px solid var(--marble-vein);
+    background: var(--ok-bg);
+    padding: 20px 22px;
+    display: none;
+  }
+
+  .result.show { display: block; }
+  .result.error { background: #F7EDEA; border-color: #E3C4BC; }
+
+  .result-headline {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--stone);
+    margin: 0 0 14px;
+  }
+
+  .result-headline.error-text { color: var(--danger); font-size: 15px; font-family: inherit; font-weight: 600; }
+
+  .breakdown { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .breakdown tr td { padding: 5px 0; }
+  .breakdown tr td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--stone); }
+  .breakdown tr td:first-child { color: var(--stone-soft); }
+  .breakdown tr.total td { border-top: 1px solid var(--marble-vein); padding-top: 9px; margin-top: 4px; font-weight: 700; color: var(--stone); }
+
+  .calc-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 40px 0 34px;
+  }
+
+  .calc-divider::before,
+  .calc-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--marble-vein);
+  }
+
+  .calc-divider span {
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    color: var(--stone-soft);
+    white-space: nowrap;
+  }
+
+  h2.calc-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0 0 24px;
+    color: var(--stone);
+  }
+
+  .field.hidden { display: none; }
+
+  @media (max-width: 480px) {
+    .row, .foam-grid { grid-template-columns: 1fr; }
+    .sheet-head, .sheet-body { padding-left: 22px; padding-right: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="sheet-head">
+    <p class="kicker">Handicraft Bazaar &nbsp;·&nbsp; Packing</p>
+    <h1>PU Foam Cost Calculator</h1>
+  </div>
+
+  <div class="sheet-body">
+
+    <div class="section">
+      <div class="section-title-row">
+        <p class="section-title">Box (outer carton)</p>
+        <div class="unit-toggle" id="boxUnitToggle">
+          <button type="button" class="active" data-unit="in" onclick="setUnit('box','in')">inch</button>
+          <button type="button" data-unit="mm" onclick="setUnit('box','mm')">mm</button>
+          <button type="button" data-unit="cm" onclick="setUnit('box','cm')">cm</button>
+          <button type="button" data-unit="m" onclick="setUnit('box','m')">m</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="boxL">Length</label>
+          <input id="boxL" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="boxW">Width</label>
+          <input id="boxW" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="boxH">Height</label>
+          <input id="boxH" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title-row">
+        <p class="section-title">Item (idol / temple piece)</p>
+        <div class="unit-toggle" id="itemUnitToggle">
+          <button type="button" class="active" data-unit="in" onclick="setUnit('item','in')">inch</button>
+          <button type="button" data-unit="mm" onclick="setUnit('item','mm')">mm</button>
+          <button type="button" data-unit="cm" onclick="setUnit('item','cm')">cm</button>
+          <button type="button" data-unit="m" onclick="setUnit('item','m')">m</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="itemL">Length</label>
+          <input id="itemL" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="itemW">Width</label>
+          <input id="itemW" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="itemH">Height</label>
+          <input id="itemH" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title" style="border-bottom:1px solid var(--marble-vein); padding-bottom:8px; margin-bottom:12px;">Foam &amp; packing details</p>
+      <div class="foam-grid">
+        <div class="field">
+          <label for="densityType">Foam grade</label>
+          <select id="densityType" onchange="toggleManualDensity('densityType','manualDensity')">
+            <option value="5">Low Density F6 (5 kg/m³)</option>
+            <option value="10" selected>Medium Density F10 (10 kg/m³)</option>
+            <option value="20">High Density F20 (20 kg/m³)</option>
+            <option value="manual">Manual entry</option>
+          </select>
+        </div>
+        <div class="field hidden" id="manualDensityField">
+          <label for="manualDensity">Density (kg/m³)</label>
+          <input id="manualDensity" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="price">Foam price (₹/kg)</label>
+          <input id="price" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="filmCost">Film cost (%)</label>
+          <input id="filmCost" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <p class="field-note">Film cost = foam cost ka itna % extra, seedha total cost me add ho jayega.</p>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate foam cost</button>
+
+    <div class="result" id="result">
+      <p class="result-headline" id="resultHeadline"></p>
+      <table class="breakdown" id="breakdown"></table>
+    </div>
+
+    <div class="calc-divider"><span>FOAM IN BAG — C.F.T CALCULATION</span></div>
+
+    <h2 class="calc-title">Foam in Bag (C.F.T Calculation)</h2>
+
+    <div class="section">
+      <div class="section-title-row">
+        <p class="section-title">Bag size</p>
+        <div class="unit-toggle" id="bagUnitToggle">
+          <button type="button" class="active" data-unit="in" onclick="setUnit('bag','in')">inch</button>
+          <button type="button" data-unit="mm" onclick="setUnit('bag','mm')">mm</button>
+          <button type="button" data-unit="cm" onclick="setUnit('bag','cm')">cm</button>
+          <button type="button" data-unit="m" onclick="setUnit('bag','m')">m</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="bagL">Length</label>
+          <input id="bagL" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="bagW">Width</label>
+          <input id="bagW" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="bagT">Thickness</label>
+          <input id="bagT" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title" style="border-bottom:1px solid var(--marble-vein); padding-bottom:8px; margin-bottom:12px;">Fill &amp; packing details</p>
+      <div class="foam-grid">
+        <div class="field">
+          <label for="fillPercent">Fill (%)</label>
+          <input id="fillPercent" type="number" step="any" min="0" max="100" inputmode="decimal" value="70">
+        </div>
+        <div class="field">
+          <label for="densityType2">Foam grade</label>
+          <select id="densityType2" onchange="toggleManualDensity('densityType2','manualDensity2')">
+            <option value="5">Low Density F6 (5 kg/m³)</option>
+            <option value="10" selected>Medium Density F10 (10 kg/m³)</option>
+            <option value="20">High Density F20 (20 kg/m³)</option>
+            <option value="manual">Manual entry</option>
+          </select>
+        </div>
+        <div class="field hidden" id="manualDensity2Field">
+          <label for="manualDensity2">Density (kg/m³)</label>
+          <input id="manualDensity2" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="price2">Foam price (₹/kg)</label>
+          <input id="price2" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="filmCost2">Film cost (%)</label>
+          <input id="filmCost2" type="number" step="any" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <p class="field-note">Fill % = expand hone ke baad foam bag ka kitna hissa bharega (baaki hissa khaali rahega, jaise 80% ka matlab 20% khaali). Film cost = foam cost ka itna % extra, seedha total cost me add ho jayega. C.F.T = Cubic Feet, bag ka volume yahin breakdown me dikhega.</p>
+    </div>
+
+    <button class="calc-btn" onclick="calculateBag()">Calculate bag foam cost</button>
+
+    <div class="result" id="result2">
+      <p class="result-headline" id="resultHeadline2"></p>
+      <table class="breakdown" id="breakdown2"></table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const unitState = { box: "in", item: "in", bag: "in" };
+
+function setUnit(section, unit) {
+  unitState[section] = unit;
+  const toggle = document.getElementById(section + "UnitToggle");
+  toggle.querySelectorAll("button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.unit === unit);
+  });
+}
+
+function toggleManualDensity(selectId, manualId) {
+  const isManual = document.getElementById(selectId).value === "manual";
+  document.getElementById(manualId + "Field").classList.toggle("hidden", !isManual);
+}
+
+function fmt(n, decimals) {
+  return n.toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function getVal(id) {
+  return parseFloat(document.getElementById(id).value);
+}
+
+function toMeters(value, unit) {
+  switch (unit) {
+    case "mm": return value * 0.001;
+    case "cm": return value * 0.01;
+    case "m": return value;
+    default: return value * 0.0254; // inch
+  }
+}
+
+function getDensity(selectId, manualId) {
+  const selectVal = document.getElementById(selectId).value;
+  if (selectVal === "manual") {
+    return getVal(manualId);
+  }
+  return parseFloat(selectVal);
+}
+
+function calculate() {
+  const dimIds = ["boxL","boxW","boxH","itemL","itemW","itemH"];
+  const otherIds = ["price","filmCost"];
+  const raw = {};
+  for (const id of [...dimIds, ...otherIds]) raw[id] = getVal(id);
+
+  const resultBox = document.getElementById("result");
+  const headline = document.getElementById("resultHeadline");
+  const breakdown = document.getElementById("breakdown");
+
+  const density = getDensity("densityType", "manualDensity");
+
+  const missing = [...dimIds, ...otherIds].filter(id => isNaN(raw[id]));
+  if (missing.length || isNaN(density)) {
+    resultBox.className = "result show error";
+    headline.className = "result-headline error-text";
+    headline.textContent = "Please fill in every field before calculating.";
+    breakdown.innerHTML = "";
+    return;
+  }
+
+  const boxL = toMeters(raw.boxL, unitState.box), boxW = toMeters(raw.boxW, unitState.box), boxH = toMeters(raw.boxH, unitState.box);
+  const itemL = toMeters(raw.itemL, unitState.item), itemW = toMeters(raw.itemW, unitState.item), itemH = toMeters(raw.itemH, unitState.item);
+
+  const boxVolume = boxL * boxW * boxH;
+  const itemVolume = itemL * itemW * itemH;
+  const emptySpace = boxVolume - itemVolume;
+
+  if (emptySpace <= 0) {
+    resultBox.className = "result show error";
+    headline.className = "result-headline error-text";
+    headline.textContent = "Item is the same size as or larger than the box — no empty space to fill.";
+    breakdown.innerHTML = `
+      <tr><td>Box volume</td><td>${fmt(boxVolume * 1e6, 0)} cm³</td></tr>
+      <tr><td>Item volume</td><td>${fmt(itemVolume * 1e6, 0)} cm³</td></tr>
+    `;
+    return;
+  }
+
+  const foamWeight = emptySpace * density;
+  const foamCost = foamWeight * raw.price;
+  const filmCostAmount = foamCost * (raw.filmCost / 100);
+  const totalCost = foamCost + filmCostAmount;
+
+  resultBox.className = "result show";
+  headline.className = "result-headline";
+  headline.textContent = "₹ " + fmt(totalCost, 2);
+
+  breakdown.innerHTML = `
+    <tr><td>Box volume</td><td>${fmt(boxVolume * 1e6, 0)} cm³</td></tr>
+    <tr><td>Item volume</td><td>${fmt(itemVolume * 1e6, 0)} cm³</td></tr>
+    <tr><td>Empty space to fill</td><td>${fmt(emptySpace * 1e6, 0)} cm³</td></tr>
+    <tr><td>Foam weight</td><td>${fmt(foamWeight, 3)} kg</td></tr>
+    <tr><td>Foam cost</td><td>₹ ${fmt(foamCost,2)}</td></tr>
+    <tr><td>Film cost (+${fmt(raw.filmCost,0)}%)</td><td>₹ ${fmt(filmCostAmount,2)}</td></tr>
+    <tr class="total"><td>Total cost</td><td>₹ ${fmt(totalCost,2)}</td></tr>
+  `;
+}
+
+function calculateBag() {
+  const dimIds = ["bagL","bagW","bagT"];
+  const otherIds = ["fillPercent","price2","filmCost2"];
+  const raw = {};
+  for (const id of [...dimIds, ...otherIds]) raw[id] = getVal(id);
+
+  const resultBox = document.getElementById("result2");
+  const headline = document.getElementById("resultHeadline2");
+  const breakdown = document.getElementById("breakdown2");
+
+  const density = getDensity("densityType2", "manualDensity2");
+
+  const missing = [...dimIds, ...otherIds].filter(id => isNaN(raw[id]));
+  if (missing.length || isNaN(density)) {
+    resultBox.className = "result show error";
+    headline.className = "result-headline error-text";
+    headline.textContent = "Please fill in every field before calculating.";
+    breakdown.innerHTML = "";
+    return;
+  }
+
+  const fillPercent = raw.fillPercent / 100;
+  const bagL = toMeters(raw.bagL, unitState.bag), bagW = toMeters(raw.bagW, unitState.bag), bagT = toMeters(raw.bagT, unitState.bag);
+
+  const bagVolume = bagL * bagW * bagT;
+  const bagVolumeCft = bagVolume * 35.3147; // m³ to cubic feet
+
+  // Foam should fill fillPercent of the bag (after expansion/curing) — rest stays empty.
+  const targetFilledVolume = bagVolume * fillPercent;
+  const foamWeight = targetFilledVolume * density;
+  const foamCost = foamWeight * raw.price2;
+  const filmCostAmount = foamCost * (raw.filmCost2 / 100);
+  const totalCost = foamCost + filmCostAmount;
+
+  resultBox.className = "result show";
+  headline.className = "result-headline";
+  headline.textContent = "₹ " + fmt(totalCost, 2);
+
+  breakdown.innerHTML = `
+    <tr><td>Bag volume</td><td>${fmt(bagVolumeCft, 3)} C.F.T</td></tr>
+    <tr><td>Target filled volume (${fmt(raw.fillPercent,0)}% of bag)</td><td>${fmt(targetFilledVolume, 4)} m³</td></tr>
+    <tr><td>Foam weight</td><td>${fmt(foamWeight, 3)} kg</td></tr>
+    <tr><td>Foam cost</td><td>₹ ${fmt(foamCost,2)}</td></tr>
+    <tr><td>Film cost (+${fmt(raw.filmCost2,0)}%)</td><td>₹ ${fmt(filmCostAmount,2)}</td></tr>
+    <tr class="total"><td>Total cost</td><td>₹ ${fmt(totalCost,2)}</td></tr>
+  `;
+}
+</script>
+
+</body>
+</html>
