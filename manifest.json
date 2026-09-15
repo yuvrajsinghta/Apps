@@ -2,10 +2,10 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "Ledger",
+  "name": "Apps",
   "orientation": "any",
   "scope": "/",
-  "short_name": "Ledger",
+  "short_name": "Apps",
   "start_url": "https://yuvrajsinghta.github.io/Apps/",
   "theme_color": "#ffffff",
   "icons": [
