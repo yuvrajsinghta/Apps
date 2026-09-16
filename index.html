@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -256,7 +257,7 @@
 
     <div class="section">
       <div class="section-title-row">
-        <p class="section-title">Box (outer carton)</p>
+        <p class="section-title">Box Dimension</p>
         <div class="unit-toggle" id="boxUnitToggle">
           <button type="button" class="active" data-unit="in" onclick="setUnit('box','in')">inch</button>
           <button type="button" data-unit="mm" onclick="setUnit('box','mm')">mm</button>
@@ -282,7 +283,7 @@
 
     <div class="section">
       <div class="section-title-row">
-        <p class="section-title">Item (idol / temple piece)</p>
+        <p class="section-title">Product Dimension</p>
         <div class="unit-toggle" id="itemUnitToggle">
           <button type="button" class="active" data-unit="in" onclick="setUnit('item','in')">inch</button>
           <button type="button" data-unit="mm" onclick="setUnit('item','mm')">mm</button>
@@ -307,7 +308,6 @@
     </div>
 
     <div class="section">
-      <p class="section-title" style="border-bottom:1px solid var(--marble-vein); padding-bottom:8px; margin-bottom:12px;">Foam &amp; packing details</p>
       <div class="foam-grid">
         <div class="field">
           <label for="densityType">Foam grade</label>
@@ -322,16 +322,8 @@
           <label for="manualDensity">Density (kg/m³)</label>
           <input id="manualDensity" type="number" step="any" min="0" inputmode="decimal">
         </div>
-        <div class="field">
-          <label for="price">Foam price (₹/kg)</label>
-          <input id="price" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label for="filmCost">Film cost (%)</label>
-          <input id="filmCost" type="number" step="any" min="0" inputmode="decimal">
-        </div>
       </div>
-      <p class="field-note">Film cost = foam cost ka itna % extra, seedha total cost me add ho jayega.</p>
+      <p class="field-note">Foam price fixed at ₹450/kg.</p>
     </div>
 
     <button class="calc-btn" onclick="calculate()">Calculate foam cost</button>
@@ -341,80 +333,11 @@
       <table class="breakdown" id="breakdown"></table>
     </div>
 
-    <div class="calc-divider"><span>FOAM IN BAG — C.F.T CALCULATION</span></div>
-
-    <h2 class="calc-title">Foam in Bag (C.F.T Calculation)</h2>
-
-    <div class="section">
-      <div class="section-title-row">
-        <p class="section-title">Bag size</p>
-        <div class="unit-toggle" id="bagUnitToggle">
-          <button type="button" class="active" data-unit="in" onclick="setUnit('bag','in')">inch</button>
-          <button type="button" data-unit="mm" onclick="setUnit('bag','mm')">mm</button>
-          <button type="button" data-unit="cm" onclick="setUnit('bag','cm')">cm</button>
-          <button type="button" data-unit="m" onclick="setUnit('bag','m')">m</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="bagL">Length</label>
-          <input id="bagL" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label for="bagW">Width</label>
-          <input id="bagW" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label for="bagT">Thickness</label>
-          <input id="bagT" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <p class="section-title" style="border-bottom:1px solid var(--marble-vein); padding-bottom:8px; margin-bottom:12px;">Fill &amp; packing details</p>
-      <div class="foam-grid">
-        <div class="field">
-          <label for="fillPercent">Fill (%)</label>
-          <input id="fillPercent" type="number" step="any" min="0" max="100" inputmode="decimal" value="70">
-        </div>
-        <div class="field">
-          <label for="densityType2">Foam grade</label>
-          <select id="densityType2" onchange="toggleManualDensity('densityType2','manualDensity2')">
-            <option value="5">Low Density F6 (5 kg/m³)</option>
-            <option value="10" selected>Medium Density F10 (10 kg/m³)</option>
-            <option value="20">High Density F20 (20 kg/m³)</option>
-            <option value="manual">Manual entry</option>
-          </select>
-        </div>
-        <div class="field hidden" id="manualDensity2Field">
-          <label for="manualDensity2">Density (kg/m³)</label>
-          <input id="manualDensity2" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label for="price2">Foam price (₹/kg)</label>
-          <input id="price2" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label for="filmCost2">Film cost (%)</label>
-          <input id="filmCost2" type="number" step="any" min="0" inputmode="decimal">
-        </div>
-      </div>
-      <p class="field-note">Fill % = expand hone ke baad foam bag ka kitna hissa bharega (baaki hissa khaali rahega, jaise 80% ka matlab 20% khaali). Film cost = foam cost ka itna % extra, seedha total cost me add ho jayega. C.F.T = Cubic Feet, bag ka volume yahin breakdown me dikhega.</p>
-    </div>
-
-    <button class="calc-btn" onclick="calculateBag()">Calculate bag foam cost</button>
-
-    <div class="result" id="result2">
-      <p class="result-headline" id="resultHeadline2"></p>
-      <table class="breakdown" id="breakdown2"></table>
-    </div>
-
   </div>
 </div>
 
 <script>
-const unitState = { box: "in", item: "in", bag: "in" };
+const unitState = { box: "in", item: "in" };
 
 function setUnit(section, unit) {
   unitState[section] = unit;
@@ -454,11 +377,12 @@ function getDensity(selectId, manualId) {
   return parseFloat(selectVal);
 }
 
+const FOAM_PRICE = 450; // ₹/kg, fixed
+
 function calculate() {
   const dimIds = ["boxL","boxW","boxH","itemL","itemW","itemH"];
-  const otherIds = ["price","filmCost"];
   const raw = {};
-  for (const id of [...dimIds, ...otherIds]) raw[id] = getVal(id);
+  for (const id of dimIds) raw[id] = getVal(id);
 
   const resultBox = document.getElementById("result");
   const headline = document.getElementById("resultHeadline");
@@ -466,7 +390,7 @@ function calculate() {
 
   const density = getDensity("densityType", "manualDensity");
 
-  const missing = [...dimIds, ...otherIds].filter(id => isNaN(raw[id]));
+  const missing = dimIds.filter(id => isNaN(raw[id]));
   if (missing.length || isNaN(density)) {
     resultBox.className = "result show error";
     headline.className = "result-headline error-text";
@@ -494,9 +418,7 @@ function calculate() {
   }
 
   const foamWeight = emptySpace * density;
-  const foamCost = foamWeight * raw.price;
-  const filmCostAmount = foamCost * (raw.filmCost / 100);
-  const totalCost = foamCost + filmCostAmount;
+  const totalCost = foamWeight * FOAM_PRICE;
 
   resultBox.className = "result show";
   headline.className = "result-headline";
@@ -507,57 +429,7 @@ function calculate() {
     <tr><td>Item volume</td><td>${fmt(itemVolume * 1e6, 0)} cm³</td></tr>
     <tr><td>Empty space to fill</td><td>${fmt(emptySpace * 1e6, 0)} cm³</td></tr>
     <tr><td>Foam weight</td><td>${fmt(foamWeight, 3)} kg</td></tr>
-    <tr><td>Foam cost</td><td>₹ ${fmt(foamCost,2)}</td></tr>
-    <tr><td>Film cost (+${fmt(raw.filmCost,0)}%)</td><td>₹ ${fmt(filmCostAmount,2)}</td></tr>
-    <tr class="total"><td>Total cost</td><td>₹ ${fmt(totalCost,2)}</td></tr>
-  `;
-}
-
-function calculateBag() {
-  const dimIds = ["bagL","bagW","bagT"];
-  const otherIds = ["fillPercent","price2","filmCost2"];
-  const raw = {};
-  for (const id of [...dimIds, ...otherIds]) raw[id] = getVal(id);
-
-  const resultBox = document.getElementById("result2");
-  const headline = document.getElementById("resultHeadline2");
-  const breakdown = document.getElementById("breakdown2");
-
-  const density = getDensity("densityType2", "manualDensity2");
-
-  const missing = [...dimIds, ...otherIds].filter(id => isNaN(raw[id]));
-  if (missing.length || isNaN(density)) {
-    resultBox.className = "result show error";
-    headline.className = "result-headline error-text";
-    headline.textContent = "Please fill in every field before calculating.";
-    breakdown.innerHTML = "";
-    return;
-  }
-
-  const fillPercent = raw.fillPercent / 100;
-  const bagL = toMeters(raw.bagL, unitState.bag), bagW = toMeters(raw.bagW, unitState.bag), bagT = toMeters(raw.bagT, unitState.bag);
-
-  const bagVolume = bagL * bagW * bagT;
-  const bagVolumeCft = bagVolume * 35.3147; // m³ to cubic feet
-
-  // Foam should fill fillPercent of the bag (after expansion/curing) — rest stays empty.
-  const targetFilledVolume = bagVolume * fillPercent;
-  const foamWeight = targetFilledVolume * density;
-  const foamCost = foamWeight * raw.price2;
-  const filmCostAmount = foamCost * (raw.filmCost2 / 100);
-  const totalCost = foamCost + filmCostAmount;
-
-  resultBox.className = "result show";
-  headline.className = "result-headline";
-  headline.textContent = "₹ " + fmt(totalCost, 2);
-
-  breakdown.innerHTML = `
-    <tr><td>Bag volume</td><td>${fmt(bagVolumeCft, 3)} C.F.T</td></tr>
-    <tr><td>Target filled volume (${fmt(raw.fillPercent,0)}% of bag)</td><td>${fmt(targetFilledVolume, 4)} m³</td></tr>
-    <tr><td>Foam weight</td><td>${fmt(foamWeight, 3)} kg</td></tr>
-    <tr><td>Foam cost</td><td>₹ ${fmt(foamCost,2)}</td></tr>
-    <tr><td>Film cost (+${fmt(raw.filmCost2,0)}%)</td><td>₹ ${fmt(filmCostAmount,2)}</td></tr>
-    <tr class="total"><td>Total cost</td><td>₹ ${fmt(totalCost,2)}</td></tr>
+    <tr class="total"><td>Total cost (@ ₹${FOAM_PRICE}/kg)</td><td>₹ ${fmt(totalCost,2)}</td></tr>
   `;
 }
 </script>
